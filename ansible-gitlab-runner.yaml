@@ -1,0 +1,24 @@
+---
+- name: Install and Register Gitlab-runner
+  hosts: "{{ lookup('env', 'CI_HOSTS') }}"
+  remote_user: ubuntu
+  become: true
+  vars_files:
+    - vars-gitlab-runner.yaml
+
+  tasks:
+    - name: Download install script
+      shell: curl -L "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh" | sudo bash
+
+    - name: Install Runner
+      apt:
+        name:
+          - gitlab-runner
+        state: latest
+        update_cache: true   
+
+    - name: Register gitlab-runner
+      shell: gitlab-runner register -n {{ gl_url }} {{ gl_registration_token }} {{ gl_executor }} {{ gl_docker_image }} {{ gl_locked }} {{ gl_volumes }} {{ gl_run_untagged }} {{ gl_access_level }} {{ gl_runner_name }} {{ gl_tag_list }} {{ gl_request_concurrency }} {{ gl_privileged }}
+
+    - name: Add gitlab-runner to Docker group
+      shell: sudo usermod -a -G docker gitlab-runner

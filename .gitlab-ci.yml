@@ -1,0 +1,32 @@
+---
+default:
+  image: docker:stable
+  tags: 
+    - gitlab-ci
+
+services:
+  - docker:dind
+
+stages:
+  - develop
+  - production
+  - infrastructure
+  - runners
+  - build
+
+build:ansible:
+  stage: build
+  when: manual
+  except:
+    variables:
+      - $CI_SKIP_BUILD == "true"
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build --pull -t "$CI_REGISTRY_IMAGE/ansible-7.4.0:latest" .
+    - docker push "$CI_REGISTRY_IMAGE/ansible-7.4.0:latest"
+
+include:
+  - local: '.gitlab-cd/.deploy-develop.yml'
+  - local: '.gitlab-cd/.deploy-prod.yml'
+  - local: '.gitlab-cd/.deploy-infra.yml'
+  - local: '.gitlab-cd/.deploy-runners.yml'

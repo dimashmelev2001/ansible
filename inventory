@@ -1,0 +1,30 @@
+[runners]
+runner-host-1           ansible_host=10.20.30.21
+
+[infrastructure]
+bastion-host             ansible_host=10.20.30.10
+runner-host-1            ansible_host=10.20.30.21
+graylog-host-1           ansible_host=10.20.30.20
+zabbix-host-1            ansible_host=10.20.30.22
+
+[development]
+development-instance-1   ansible_host=10.20.30.11
+development-instance-2   ansible_host=10.20.30.12
+development-instance-3   ansible_host=10.20.30.13
+
+[production]
+production-instance-1    ansible_host=10.20.30.31
+production-instance-2    ansible_host=10.20.30.32
+production-instance-3    ansible_host=10.20.30.33
+
+[development-runner]
+development-instance-1   ansible_host=10.20.30.11
+
+[production-runner]
+production-instance-1    ansible_host=10.20.30.31
+
+[bastion-runner]
+bastion-host             ansible_host=10.20.30.10
+
+[graylog-runner]
+graylog-host-1           ansible_host=10.20.30.20

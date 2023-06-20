@@ -1,0 +1,36 @@
+---
+- name: Install Docker on VMs
+  hosts: "{{ lookup('env', 'CI_HOSTS') }}"
+  remote_user: ubuntu
+  become: true
+  
+  tasks:
+    - name: Install apt-transport-https
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - lsb-release
+          - gnupg
+        state: latest
+        update_cache: true
+
+    - name: GPG key
+      shell: |
+        sudo install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        sudo chmod a+r /etc/apt/keyrings/docker.gpg
+        echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+    - name: Install Docker
+      apt:
+        name:
+          - docker
+          - docker.io
+          - docker-compose
+          - docker-registry
+        state: latest
+        update_cache: true
+
+    - name: Init Docker Swarm mode
+      shell: docker swarm init

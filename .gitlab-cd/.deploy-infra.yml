@@ -1,0 +1,40 @@
+---
+deploy:infra:docker:
+  stage: infrastructure
+  image: $CI_REGISTRY_IMAGE/ansible-7.4.0:latest
+  when: manual
+  before_script:
+    - cat ${CI_PRIVATE_SSH_KEY} > /root/.ssh/id_ecdsa
+    - chmod 0600 /root/.ssh/id_ecdsa
+  script:
+    - ansible-playbook ansible-install-docker.yaml --become --private-key=/root/.ssh/id_ecdsa -i inventory
+  variables:
+    CI_HOSTS: "infrastructure"
+
+deploy:bastion:gitlab-runner:
+  stage: infrastructure
+  image: $CI_REGISTRY_IMAGE/ansible-7.4.0:latest
+  when: manual
+  before_script:
+    - cat ${CI_PRIVATE_SSH_KEY} > /root/.ssh/id_ecdsa
+    - chmod 0600 /root/.ssh/id_ecdsa
+  script:
+    - ansible-playbook ansible-gitlab-runner.yaml --become --private-key=/root/.ssh/id_ecdsa -i inventory
+  variables:
+    CI_HOSTS: "bastion-runner"
+    CI_NAME:  "bastion-runner"
+    CI_TAGS:  "bastion-runner"
+
+deploy:graylog:gitlab-runner:
+  stage: infrastructure
+  image: $CI_REGISTRY_IMAGE/ansible-7.4.0:latest
+  when: manual
+  before_script:
+    - cat ${CI_PRIVATE_SSH_KEY} > /root/.ssh/id_ecdsa
+    - chmod 0600 /root/.ssh/id_ecdsa
+  script:
+    - ansible-playbook ansible-gitlab-runner.yaml --become --private-key=/root/.ssh/id_ecdsa -i inventory
+  variables:
+    CI_HOSTS: "graylog-runner"
+    CI_NAME:  "graylog-runner"
+    CI_TAGS:  "graylog-runner"

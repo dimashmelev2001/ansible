@@ -1,0 +1,12 @@
+---
+deploy:runners:gitlab-runner:
+  stage: runners
+  image: $CI_REGISTRY_IMAGE/ansible-7.4.0:latest
+  when: manual
+  before_script:
+    - cat ${CI_PRIVATE_SSH_KEY} > /root/.ssh/id_ecdsa
+    - chmod 0600 /root/.ssh/id_ecdsa
+  script:
+    - ansible-playbook ansible-gitlab-runner.yaml --become --private-key=/root/.ssh/id_ecdsa -i inventory
+  variables:
+    CI_HOSTS: "runners"
